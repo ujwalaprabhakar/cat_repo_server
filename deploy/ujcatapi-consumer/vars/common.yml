@@ -1,0 +1,41 @@
+# common vars, if you need to customise for a given env, edit dev.yml, staging-saas.yml,
+# build-saas.yml, or live-saas.yml. If you want to specify a new var for all envs, edit this file.
+
+secrets:
+  - ujcatapi
+  - ibento
+
+deployment_replicas: 2
+
+deployment_container_name: "{{ app_name }}"
+
+deployment_containers_command: ["poetry", "run", "python", "-m", "ujcatapi.main", "consumer"]
+
+deployment_liveness_probe:
+  exec:
+    command: ["poetry", "run", "python", "-m", "ujcatapi.main", "consumer-healthcheck"]
+  initialDelaySeconds: 15
+  timeoutSeconds: 15
+  periodSeconds: 60
+
+deployment_resource_requests:
+  cpu: 100m
+  memory: 200Mi
+deployment_resource_limits:
+  cpu: 150m
+  memory: 300Mi
+
+deployment_security_context:
+  fsGroup: 1000 # USER from Dockerfile
+  runAsUser: 1000 # USER from Dockerfile
+
+# HorizontalPodAutoscaling specific vars
+hpa_required: yes
+hpa_cpu_avg_util: 80
+hpa_mem_avg_util: 70
+hpa_min_replicas: "{{ deployment_replicas }}"
+hpa_max_replicas: "{{ (deployment_replicas * 2.0) | round }}"
+
+# PodDisruptionBudget specific vars
+pdb_required: yes
+pdb_min_available: "50%"

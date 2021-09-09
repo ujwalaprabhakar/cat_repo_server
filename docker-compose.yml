@@ -1,0 +1,94 @@
+version: "3.7"
+services:
+  api:
+    build:
+      context: .
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    container_name: ujcatapi-api
+    ports:
+      - "${APP_PORT:-10000}:10000"
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL}
+      ENVIRONMENT: ${ENVIRONMENT}
+      ENABLE_RELOAD_UVICORN: ${ENABLE_RELOAD_UVICORN}
+      ENABLE_MONGODB: ${ENABLE_MONGODB}
+      MONGODB_URL: ${MONGODB_URL}
+      ENABLE_AMQP: ${ENABLE_AMQP}
+      AMQP_URL: ${AMQP_URL}
+      ENABLE_FOO: ${ENABLE_FOO}
+      ENABLE_BAR: ${ENABLE_BAR}
+    volumes:
+      - ".:/srv"
+    networks:
+      internal:
+      ai-dev-network:
+        aliases:
+          - ujcatapi
+    hostname: ujcatapi
+    depends_on:
+      - "mongodb"
+    command: ["poetry", "run", "python", "-m", "ujcatapi.main", "api"]
+    healthcheck:
+      test: curl --fail http://localhost:10000/status?healthcheck || exit 1
+      interval: 60s
+      timeout: 15s
+      retries: 4
+
+  mongodb:
+    image: mongo:4.4
+    container_name: ujcatapi-mongodb
+    ports:
+      - "${HOST_DB_PORT:-27017}:27017"
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT}
+    networks:
+      - internal
+    volumes:
+      - "./migrations:/mnt"
+      - db_data:/data/db
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo --quiet || exit 1
+      interval: 15s
+      timeout: 15s
+      retries: 4
+
+  consumer:
+    build:
+      context: .
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    scale: 2
+    restart: on-failure
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL}
+      ENVIRONMENT: ${ENVIRONMENT}
+      ENABLE_RELOAD_UVICORN: ${ENABLE_RELOAD_UVICORN}
+      ENABLE_MONGODB: ${ENABLE_MONGODB}
+      MONGODB_URL: ${MONGODB_URL}
+      ENABLE_AMQP: ${ENABLE_AMQP}
+      AMQP_URL: ${AMQP_URL}
+      ENABLE_FOO: ${ENABLE_FOO}
+      ENABLE_BAR: ${ENABLE_BAR}
+    volumes:
+      - ".:/srv"
+    networks:
+      ai-dev-network:
+        aliases:
+          - ujcatapi-consumer
+    hostname: ujcatapi-consumer
+    command: ["poetry", "run", "python", "-m", "ujcatapi.main", "consumer"]
+    healthcheck:
+      test: poetry run python -m ujcatapi.main consumer-healthcheck
+      interval: 60s
+      timeout: 15s
+      retries: 4
+
+volumes:
+  db_data: {}
+
+networks:
+  internal:
+    external: false
+  ai-dev-network:
+    external: true

@@ -1,0 +1,33 @@
+# live-saas specific vars, that need to be overridden from common.yml
+
+deployment_env_vars:
+  - name: LOG_LEVEL
+    value: "20"
+  - name: ENVIRONMENT
+    value: "live-saas"
+  - name: ENABLE_RELOAD_UVICORN
+    value: "false"
+  - name: ENABLE_MONGODB
+    value: "true"
+  - name: MONGODB_URL
+    valueFrom:
+      secretKeyRef:
+        name: ujcatapi
+        key: mongodb-url
+  - name: ENABLE_AMQP
+    value: "true"
+  - name: AMQP_URL
+    valueFrom:
+      secretKeyRef:
+        name: ibento
+        key: amqp-url
+  - name: ELASTIC_APM_ENABLED
+    value: "false"
+  - name: ELASTIC_APM_SERVER_URL
+    value: "http://elastic-apm-server.kube-system:8200"
+  - name: SELF_URL
+    value: "http://ujcatapi.<class 'jinja2.utils.Namespace'>:10000"
+  - name: ENABLE_FOO
+    value: "true"
+  - name: ENABLE_BAR
+    value: "false"

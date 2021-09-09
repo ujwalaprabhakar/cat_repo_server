@@ -1,0 +1,56 @@
+# dev specific vars, that need to be overridden from common.yml
+
+deployment_replicas: 1
+
+deployment_rolling_update:
+  maxUnavailable: "100%"
+  maxSurge: 0
+
+deployment_image: "gcr.io/gengo-internal/{{ app_name }}:latest"
+deployment_image_pull_policy: Always
+
+deployment_env_vars:
+  - name: LOG_LEVEL
+    value: "20"
+  - name: ENVIRONMENT
+    value: "dev"
+  - name: ENABLE_RELOAD_UVICORN
+    value: "true"
+  - name: ENABLE_MONGODB
+    value: "true"
+  - name: MONGODB_URL
+    value: "mongodb://mongodb:27017/ujcatapi_dev"
+  - name: ENABLE_AMQP
+    value: "true"
+  - name: AMQP_URL
+    value: "amqp://amqp:5672"
+  - name: ELASTIC_APM_ENABLED
+    value: "false"
+  - name: ELASTIC_APM_SERVER_URL
+    value: "http://elastic-apm-server.kube-system:8200"
+  - name: SELF_URL
+    value: "http://ujcatapi.<class 'jinja2.utils.Namespace'>:10000"
+  - name: ENABLE_FOO
+    value: "true"
+  - name: ENABLE_BAR
+    value: "false"
+
+deployment_resource_requests: {}
+deployment_resource_limits: {}
+deployment_dev_mounts:
+  - name: src
+    readOnly: false
+    mountPath: "/srv/ujcatapi"
+  - name: tests
+    readOnly: false
+    mountPath: "/srv/tests"
+deployment_dev_volumes:
+  - name: src
+    hostPath:
+      path: "{{ mount_root_path }}/ujcatapi/ujcatapi"
+  - name: static
+    hostPath:
+      path: "{{ mount_root_path }}/ujcatapi/static"
+  - name: tests
+    hostPath:
+      path: "{{ mount_root_path }}/ujcatapi/tests"

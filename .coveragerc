@@ -1,0 +1,6 @@
+[run]
+omit = ujcatapi/gunicorn_config.py
+data_file = /tmp/.ujcatapi.coverage
+
+[xml]
+output = /tmp/.ujcatapi.coverage.xml

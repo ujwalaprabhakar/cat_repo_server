@@ -1,0 +1,62 @@
+# common vars, if you need to customise for a given env, edit dev.yml, staging-saas.yml,
+# build-saas.yml, or live-saas.yml. If you want to specify a new var for all envs, edit this file.
+
+secrets:
+  - "{{ app_name }}"
+  - ibento
+
+deployment_replicas: 2
+
+deployment_container_name: "{{ app_name }}"
+
+deployment_containers_command: ["poetry", "run", "python", "-m", "ujcatapi.main", "api"]
+
+deployment_container_ports:
+  - protocol: TCP
+    containerPort: 10000
+
+deployment_liveness_probe:
+  httpGet:
+    path: /status
+    port: 10000
+  initialDelaySeconds: 15
+  timeoutSeconds: 10
+  periodSeconds: 40
+
+deployment_readiness_probe:
+  httpGet:
+    path: /status
+    port: 10000
+  initialDelaySeconds: 15
+  timeoutSeconds: 10
+  periodSeconds: 30
+
+deployment_resource_requests:
+  cpu: 100m
+  memory: 200Mi
+deployment_resource_limits:
+  cpu: 150m
+  memory: 300Mi
+
+deployment_security_context:
+  fsGroup: 1000 # USER from Dockerfile
+  runAsUser: 1000 # USER from Dockerfile
+
+# Service specific vars
+service_required: yes
+service_type: ClusterIP
+service_ports:
+  - name: http
+    protocol: TCP
+    port: 10000
+
+# HorizontalPodAutoscaling specific vars
+hpa_required: yes
+hpa_cpu_avg_util: 75
+hpa_mem_avg_util: 85
+hpa_min_replicas: "{{ deployment_replicas }}"
+hpa_max_replicas: "{{ (deployment_replicas * 2.0) | round }}"
+
+# PodDisruptionBudget specific vars
+pdb_required: yes
+pdb_min_available: "50%"
