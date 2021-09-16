@@ -79,3 +79,22 @@ async def list_cats(
     return dto.ListResponse[dto.CatSummary](
         results=cat_summary_list_response, metadata=cats.metadata
     )
+
+
+@router.get("/cats/delete/{cat_id}")
+async def delete_cat(
+    cat_id: dto.CatID = Path(..., title="Cat ID", description="The ID of the Cat to get."),
+    scope: dto.Scope = Depends(serializers.scope_from_query_param),
+) -> bool:
+    """
+    View for deleting one Cat by ID.
+
+    \f
+    :return:
+    """
+
+    is_deleted = await cat_domain.delete_one(cat_id)
+    if not is_deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cat not found.")
+
+    return is_deleted
