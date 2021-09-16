@@ -81,14 +81,6 @@ def add_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(UjcatapiError, exception_handler)
 
 
-# def add_middlewares(app: FastAPI) -> None:
-#     @app.middleware("http")
-#     async def replace_content_type_header(request: Request, call_next: Callable) -> Response:
-#         response = await call_next(request)
-#         if response.headers.get("content-type") == "application/json":
-#             response.headers["content-type"] = "application/json; charset=utf-8"
-#         return response
-
 def add_middlewares(app: FastAPI) -> None:
     app.add_middleware(
         CORSMiddleware,
