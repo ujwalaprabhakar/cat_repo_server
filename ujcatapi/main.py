@@ -9,6 +9,7 @@ from ai_event_pubsub.healthcheck import run_healthcheck
 from elasticapm.contrib.starlette import ElasticAPM, make_apm_client  # type: ignore
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, Response
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from sentry_sdk.integrations.logging import LoggingIntegration
@@ -80,13 +81,31 @@ def add_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(UjcatapiError, exception_handler)
 
 
+# def add_middlewares(app: FastAPI) -> None:
+#     @app.middleware("http")
+#     async def replace_content_type_header(request: Request, call_next: Callable) -> Response:
+#         response = await call_next(request)
+#         if response.headers.get("content-type") == "application/json":
+#             response.headers["content-type"] = "application/json; charset=utf-8"
+#         return response
+
 def add_middlewares(app: FastAPI) -> None:
-    @app.middleware("http")
-    async def replace_content_type_header(request: Request, call_next: Callable) -> Response:
-        response = await call_next(request)
-        if response.headers.get("content-type") == "application/json":
-            response.headers["content-type"] = "application/json; charset=utf-8"
-        return response
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex="|".join(config.ALLOWED_ORIGINS_REGEXPES),
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=[
+            "Content-Type",
+            "Date",
+            "Content-Length",
+            "Authorization",
+            "X-Request-ID",
+            "X-Correlation-ID",
+        ],
+        max_age=1728000,
+    )
 
 
 init_logging()
