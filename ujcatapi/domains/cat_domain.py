@@ -31,4 +31,4 @@ async def find_many(
 
 
 async def delete_one(cat_id: dto.CatID) -> bool:
-    return await cat_model.delete_one(cat_id)
+    return await cat_model.delete_one(cat_id=cat_id)

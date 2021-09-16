@@ -181,8 +181,9 @@ async def delete_one(cat_id: dto.CatID) -> bool:
     collection = await get_collection(_COLLECTION_NAME)
 
     result = await collection.delete_one({"_id": query["_id"]})
+
     is_deleted = True
-    if result is None:
+    if result.deleted_count == 0:
         is_deleted = False
 
     return is_deleted
