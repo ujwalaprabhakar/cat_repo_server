@@ -99,6 +99,13 @@ def add_middlewares(app: FastAPI) -> None:
         max_age=1728000,
     )
 
+    @app.middleware("http")
+    async def replace_content_type_header(request: Request, call_next: Callable) -> Response:
+        response = await call_next(request)
+        if response.headers.get("content-type") == "application/json":
+            response.headers["content-type"] = "application/json; charset=utf-8"
+        return response
+
 
 init_logging()
 
