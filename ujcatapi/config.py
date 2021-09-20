@@ -39,9 +39,5 @@ ENABLE_BAR = _get_boolean_env_variable("ENABLE_BAR")
 
 ALLOWED_ORIGINS_REGEXPES = [
     "http://localhost[^\\.]*$",
-    "https://ai\\.gengo\\.test$",
-    "https://.*\\.telusinternational\\.ai$",
-    "https://.*\\.lionbridgeai\\.com$",
-    "https://.*\\.lionbridge\\.com$",
     "capacitor://localhost$",
 ]
