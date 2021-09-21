@@ -81,7 +81,7 @@ async def list_cats(
     )
 
 
-@router.get("/cats/delete/{cat_id}")
+@router.delete("/cats/{cat_id}")
 async def delete_cat(
     cat_id: dto.CatID = Path(..., title="Cat ID", description="The ID of the Cat to get."),
     scope: dto.Scope = Depends(serializers.scope_from_query_param),
