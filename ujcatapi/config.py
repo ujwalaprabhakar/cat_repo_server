@@ -38,6 +38,5 @@ ENABLE_FOO = _get_boolean_env_variable("ENABLE_FOO")
 ENABLE_BAR = _get_boolean_env_variable("ENABLE_BAR")
 
 ALLOWED_ORIGINS_REGEXPES = [
-    "http://localhost[^\\.]*$",
-    "capacitor://localhost$",
+    "http://localhost[^\\.]*$"
 ]
