@@ -36,3 +36,5 @@ ELASTIC_APM_SERVER_URL = os.getenv("ELASTIC_APM_SERVER_URL")
 # ====== Feature flags ======
 ENABLE_FOO = _get_boolean_env_variable("ENABLE_FOO")
 ENABLE_BAR = _get_boolean_env_variable("ENABLE_BAR")
+
+ALLOWED_ORIGINS_REGEXPES = ["http://localhost[^\\.]*$"]
