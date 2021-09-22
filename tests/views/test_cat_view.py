@@ -202,3 +202,35 @@ def test_list_cats(
         cat_sort_params=expected_cat_sort_params,
         page=expected_page,
     )
+
+
+@mock.patch("ujcatapi.domains.cat_domain.delete_one")
+def test_delete_cat_not_found(
+    mock_cat_domain_delete_not_found: mock.Mock,
+) -> None:
+    mock_cat_domain_delete_not_found.return_value = None
+
+    response = client.delete("/v1/cats/000000000000000000000000")
+
+    assert (response.status_code, response.json()) == (404, {"errors": "Cat is not found"})
+
+
+@pytest.mark.parametrize(
+    "cat_id, expected_response",
+    [
+        (
+            dto.CatID("000000000000000000000101"),
+            True,
+        )
+    ],
+)
+@mock.patch("ujcatapi.domains.cat_domain.delete_one")
+def test_delete_cat(
+    mock_cat_domain_delete_one: mock.Mock,
+    cat_id: dto.CatID,
+    expected_response: None,
+) -> None:
+    mock_cat_domain_delete_one.return_value = True
+
+    response = client.delete(f"/v1/cats/{cat_id}")
+    assert (response.status_code, response.json()) == (200, None)
