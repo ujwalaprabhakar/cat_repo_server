@@ -352,3 +352,39 @@ async def test_delete_one(
     result = await cat_model.delete_one(cat_id)
 
     assert result == expected_response
+
+
+@pytest.mark.parametrize(
+    "existing_cat_documents, cat_id, expected_response",
+    [
+        (
+            [
+                {
+                    "_id": ObjectId("000000000000000000000101"),
+                    "name": "Sammybridge Cat",
+                    "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                }
+            ],
+            dto.CatID("000000000000000000000101"),
+            True,
+        ),
+    ],
+)
+@conftest.async_test
+async def test_delete_one_and_check_empty(
+    existing_cat_documents: List[BSONDocument],
+    cat_id: dto.CatID,
+    expected_response: bool,
+) -> None:
+    collection = await get_collection(cat_model._COLLECTION_NAME)
+    await collection.insert_many(existing_cat_documents)
+
+    result = await cat_model.delete_one(cat_id)
+
+    assert result == expected_response
+
+    cursor = collection.find({}).sort([("_id", 1)])
+    cat_list = await cursor.to_list(length=2)
+
+    assert cat_list == []
