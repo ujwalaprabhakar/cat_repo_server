@@ -110,3 +110,15 @@ async def test_delete_one(mock_cat_model_delete_one: mock.Mock, cat_id: dto.CatI
     await cat_domain.delete_one(cat_id)
 
     mock_cat_model_delete_one.assert_called_once_with(cat_id=cat_id)
+
+
+@pytest.mark.parametrize(
+    "cat_id",
+    [dto.CatID("000000000000000000000201")],
+)
+@mock.patch("ujcatapi.models.cat_model.delete_one")
+@conftest.async_test
+async def test_delete_not_found(mock_cat_model_delete_one: mock.Mock, cat_id: dto.CatID) -> None:
+    await cat_domain.delete_one(cat_id)
+
+    mock_cat_model_delete_one.assert_called_once_with(cat_id=cat_id)
