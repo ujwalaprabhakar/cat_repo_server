@@ -187,5 +187,5 @@ async def update_cat_metadata(
         raise CatNotFoundError(f"Cat{cat_id} did not found")
 
     updated_cat = await find_one(cat_filter=dto.CatFilter(cat_id=cat_id))
-
+    assert updated_cat is not None
     return updated_cat

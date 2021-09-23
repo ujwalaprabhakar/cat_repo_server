@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 async def create_cat(new_cat: dto.UnsavedCat) -> dto.Cat:
     now = dates.get_utcnow()
     created_cat = await cat_model.create_cat(new_cat, now=now)
-    # partial_update_cat = dto.PartialUpdateCat(url="http://placekitten.com/200/300")
     fire_cat_created(created_cat.id)
 
     return created_cat
