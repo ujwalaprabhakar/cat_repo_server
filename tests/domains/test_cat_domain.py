@@ -98,3 +98,37 @@ async def test_find_many(
         cat_sort_params=cat_sort_params,
         page=page,
     )
+
+
+@pytest.mark.parametrize(
+    "cat_id, cat_metadata, expected_cat",
+    [
+        (
+            dto.CatID("000000000000000000000101"),
+            dto.PartialUpdateCat(url="http://placekitten.com/200/300"),
+            {
+                "id": dto.CatID("000000000000000000000101"),
+                "name": "Sammybridge Cat",
+                "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                "url": "http://placekitten.com/200/300",
+            },
+        )
+    ],
+)
+@mock.patch("ujcatapi.models.cat_model.update_cat_metadata")
+@conftest.async_test
+async def test_update_cat_metadata(
+    mock_cat_model_update_cat_metadata: mock.Mock,
+    cat_id: dto.CatID,
+    cat_metadata: dto.PartialUpdateCat,
+    expected_cat: dto.Cat,
+) -> None:
+    mock_cat_model_update_cat_metadata.return_value = expected_cat
+
+    result = await cat_domain.partial_update_cat_metadata(cat_id, cat_metadata)
+
+    assert result == expected_cat
+    mock_cat_model_update_cat_metadata.assert_called_once_with(
+        cat_id=cat_id, cat_metadata=cat_metadata
+    )

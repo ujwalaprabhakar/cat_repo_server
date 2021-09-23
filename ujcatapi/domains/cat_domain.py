@@ -9,11 +9,6 @@ from ujcatapi.models import cat_model
 logger = logging.getLogger(__name__)
 
 
-# async def create_cat(new_cat: dto.UnsavedCat) -> dto.Cat:
-#     now = dates.get_utcnow()
-#     return await cat_model.create_cat(new_cat, now=now)
-
-
 async def create_cat(new_cat: dto.UnsavedCat) -> dto.Cat:
     now = dates.get_utcnow()
     created_cat = await cat_model.create_cat(new_cat, now=now)
