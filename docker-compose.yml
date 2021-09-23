@@ -73,6 +73,7 @@ services:
     volumes:
       - ".:/srv"
     networks:
+      internal:
       ai-dev-network:
         aliases:
           - ujcatapi-consumer

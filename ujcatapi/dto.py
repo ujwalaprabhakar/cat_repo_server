@@ -95,7 +95,7 @@ class CatSummary(BaseModel):
 
 
 class PartialUpdateCat(BaseModel):
-    name: Optional[str]
+    url: Optional[str]
 
 
 class CatFilter(BaseModel):

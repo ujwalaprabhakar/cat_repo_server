@@ -8,7 +8,7 @@ import pymongo.errors
 from bson import ObjectId
 
 from ujcatapi import config, dto
-from ujcatapi.exceptions import DuplicateCatError, EmptyResultsFilter
+from ujcatapi.exceptions import CatNotFoundError, DuplicateCatError, EmptyResultsFilter
 from ujcatapi.models.common import (
     BSONDocument,
     _calculate_db_skip_value,
@@ -169,3 +169,20 @@ def cat_summary_from_bson(cat: BSONDocument) -> dto.CatSummary:
         id=bson_id_to_cat_id(cat["_id"]),
         **cat,
     )
+
+
+async def update_cat_metadata(
+    cat_id: dto.CatID, cat_metadata: dto.PartialUpdateCat
+) -> Optional[dto.Cat]:
+    collection = await get_collection(_COLLECTION_NAME)
+
+    update_query = {"$set": {"url": cat_metadata.url}}
+    filter_query = {"_id": ObjectId(cat_id)}
+
+    result = await collection.update_one(filter_query, update_query)
+
+    if not result.matched_count:
+        raise CatNotFoundError(f"Cat{cat_id} did not found")
+
+    updated_cat = await find_one(cat_filter=dto.CatFilter(cat_id=cat_id))
+    return updated_cat

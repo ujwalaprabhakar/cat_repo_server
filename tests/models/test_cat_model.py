@@ -297,3 +297,59 @@ async def test_find_many(
     )
 
     assert found_cat_summaries == expected_cat_summaries
+
+
+@pytest.mark.parametrize(
+    "existing_cat_documents, cat_id, cat_metadata, expected_document",
+    [
+        (
+            [
+                {
+                    "_id": ObjectId("000000000000000000000101"),
+                    "name": "Sammybridge Cat",
+                    "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                },
+                {
+                    "_id": ObjectId("000000000000000000000102"),
+                    "name": "Shirasu Sleep Industries Cat",
+                    "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                },
+            ],
+            dto.CatID("000000000000000000000101"),
+            dto.PartialUpdateCat(url="http://placekitten.com/200/300"),
+            [
+                {
+                    "_id": ObjectId("000000000000000000000101"),
+                    "name": "Sammybridge Cat",
+                    "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "url": "http://placekitten.com/200/300",
+                },
+                {
+                    "_id": ObjectId("000000000000000000000102"),
+                    "name": "Shirasu Sleep Industries Cat",
+                    "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                },
+            ],
+        )
+    ],
+)
+@conftest.async_test
+async def test_update_model_cat_metadata(
+    existing_cat_documents: List[BSONDocument],
+    cat_id: dto.CatID,
+    cat_metadata: dto.PartialUpdateCat,
+    expected_document: List[BSONDocument],
+) -> None:
+    collection = await get_collection(cat_model._COLLECTION_NAME)
+    await collection.insert_many(existing_cat_documents)
+
+    await cat_model.update_cat_metadata(cat_id, cat_metadata)
+
+    # assert found_cat == expected_result
+    actual_documents = [document async for document in collection.find()]
+
+    assert actual_documents == expected_document
