@@ -174,11 +174,9 @@ def cat_summary_from_bson(cat: BSONDocument) -> dto.CatSummary:
 async def update_cat_metadata(
     cat_id: dto.CatID, cat_metadata: dto.PartialUpdateCat
 ) -> Optional[dto.Cat]:
-    print("in update_cat_metadata")
     collection = await get_collection(_COLLECTION_NAME)
 
     update_query = {"$set": {"url": cat_metadata.url}}
-    print("here is query -------------->", update_query)
     filter_query = {"_id": ObjectId(cat_id)}
 
     result = await collection.update_one(filter_query, update_query)
@@ -187,5 +185,4 @@ async def update_cat_metadata(
         raise CatNotFoundError(f"Cat{cat_id} did not found")
 
     updated_cat = await find_one(cat_filter=dto.CatFilter(cat_id=cat_id))
-    assert updated_cat is not None
     return updated_cat
