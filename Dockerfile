@@ -1,5 +1,5 @@
 # When updating Python, you also need to update pyproject.toml:8 and poetry.lock (python-versions)
-FROM python:3.9.6-slim-buster
+FROM python:3.11.1-slim-buster
 
 RUN pip install --upgrade pip 'poetry==1.1.6'
 
