@@ -28,3 +28,7 @@ async def find_many(
         page=page,
     )
     return results
+
+
+async def delete_one(cat_id: dto.CatID) -> bool:
+    return await cat_model.delete_one(cat_id=cat_id)

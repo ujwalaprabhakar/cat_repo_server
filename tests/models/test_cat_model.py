@@ -297,3 +297,90 @@ async def test_find_many(
     )
 
     assert found_cat_summaries == expected_cat_summaries
+
+
+# @pytest.mark.parametrize(
+#     "existing_cat_documents, cat_id, expected_response",
+#     [
+#         (
+#             [
+#                 {
+#                     "_id": ObjectId("000000000000000000000101"),
+#                     "name": "Sammybridge Cat",
+#                     "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                     "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                 },
+#                 {
+#                     "_id": ObjectId("000000000000000000000102"),
+#                     "name": "Shirasu Sleep Industries Cat",
+#                     "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                     "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                 },
+#             ],
+#             dto.CatID("000000000000000000000101"),
+#             True,
+#         ),
+#         (
+#             [
+#                 {
+#                     "_id": ObjectId("000000000000000000000101"),
+#                     "name": "Sammybridge Cat",
+#                     "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                     "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                 },
+#                 {
+#                     "_id": ObjectId("000000000000000000000102"),
+#                     "name": "Shirasu Sleep Industries Cat",
+#                     "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                     "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+#                 },
+#             ],
+#             dto.CatID("000000000000000000000000"),
+#             False,
+#         ),
+#     ],
+# )
+# @conftest.async_test
+# async def test_delete_one(
+#     existing_cat_documents: List[BSONDocument],
+#     cat_id: dto.CatID,
+#     expected_response: bool,
+# ) -> None:
+#     collection = await get_collection(cat_model._COLLECTION_NAME)
+#     await collection.insert_many(existing_cat_documents)
+
+#     result = await cat_model.delete_one(cat_id)
+
+#     assert result == expected_response
+
+
+@pytest.mark.parametrize(
+    "existing_cat_documents, cat_id, expected_response",
+    [
+        (
+            [
+                {
+                    "_id": ObjectId("000000000000000000000101"),
+                    "name": "Sammybridge Cat",
+                    "ctime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                    "mtime": datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+                }
+            ],
+            dto.CatID("000000000000000000000101"),
+            True,
+        ),
+    ],
+)
+@conftest.async_test
+async def test_delete_one(
+    existing_cat_documents: List[BSONDocument],
+    cat_id: dto.CatID,
+    expected_response: bool,
+) -> None:
+    collection = await get_collection(cat_model._COLLECTION_NAME)
+    await collection.insert_many(existing_cat_documents)
+    # expected_documents = []
+    result = await cat_model.delete_one(cat_id)
+    actual_documents = [document async for document in collection.find()]
+    assert result == expected_response
+    assert actual_documents == []

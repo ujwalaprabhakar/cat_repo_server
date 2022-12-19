@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 
 from ujcatapi import dto, serializers
 from ujcatapi.domains import cat_domain
+from ujcatapi.exceptions import EntityNotFoundError
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -79,3 +80,20 @@ async def list_cats(
     return dto.ListResponse[dto.CatSummary](
         results=cat_summary_list_response, metadata=cats.metadata
     )
+
+
+@router.delete("/cats/{cat_id}")
+async def delete_cat(
+    cat_id: dto.CatID = Path(..., title="Cat ID", description="The ID of the Cat to get."),
+    scope: dto.Scope = Depends(serializers.scope_from_query_param),
+) -> None:
+    """
+    View for deleting one Cat by ID.
+
+    \f
+    :return:
+    """
+
+    is_deleted = await cat_domain.delete_one(cat_id)
+    if not is_deleted:
+        raise EntityNotFoundError("Cat is not found")
